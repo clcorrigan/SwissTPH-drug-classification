@@ -63,3 +63,7 @@ Because this project originally was working with the TIMICI data from Kenya, the
     - Each value needs to be seperated by an OR, either uppercase or lower case 
         - If you are using the codebook from a language is not English, you need to go and change the values between drugs to be OR 
         - This does not apply for drugs that are in parentheses, for example \(Amox\)
+3. The headers that matter are db_name, label, type, value, and category
+       - If the headers are not spelled in these exact manners, please change them to fit
+4. Drug name spellings matter, but things are not case sensitive.
+     -
