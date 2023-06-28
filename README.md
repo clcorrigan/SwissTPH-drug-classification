@@ -58,12 +58,22 @@ Because this project originally was working with the TIMICI data from Kenya, the
 1. Each separate category has it's own row in the codebook. The format is not such that there is one cell that has all the data in one block. 
     - For Example: 
     > 75=Céfadroxil OU Oracéfal|55=Céfixime OU Oroken OU Ofiken OU Fixim|63=Doxycycline OU Vibra|64=Erythromycine (Ery)|65=Flucloxacilline OU Staphypen OU Flustaph|67=Isoniazide (sans rifampicine, etc) OU Rimifon|68=Mupirocine OU Bactroban|70=Phénoxyméthylpénicilline OU Ospen|71=Rifampicine (sans isoniazide etc) OU Rimactan|38=Rifampicine / Isoniazide (RH)|39=Rifampicine / Isoniazide / Pyrazinamide / Ethambutol (RHZE) OU Lamprène|74=Chlortétracycline OU Tétracycline OU Auréomycine|96=Aucun des éléments ci-dessus 
-    All being in the "value" category would not work and would lead to errors.  
+    - All being in the "value" category would not work and would lead to errors.  
 2. For cells that hold multiple different drug names that apply to a specific category or value 
     - Each value needs to be seperated by an OR, either uppercase or lower case 
         - If you are using the codebook from a language is not English, you need to go and change the values between drugs to be OR 
         - This does not apply for drugs that are in parentheses, for example \(Amox\)
 3. The headers that matter are db_name, label, type, value, and category
-       - If the headers are not spelled in these exact manners, please change them to fit
-4. Drug name spellings matter, but things are not case sensitive.
-     -
+       - If the headers are not spelled this way exactly 
+4. Drug name spellings matter, but things are not case sensitive
+    - If you have drug names that are in an language that uses accents, go back in the drug information and include spellings both with and without accents
+          - Example 
+              - Change "Céfadroxil OR Oracéfal" to be "Céfadroxil OR Oracéfal OR Cefadroxil OR Oracefal"
+    - If there are common acronyms or alternate spellings include those as well 
+    - You do not need to account for capital or lowercase letters
+
+### Data Requirements 
+Most of the time the codebook already matches the data so everything should be good.
+- Currently in the data there will be two different versions of drug data
+      1. One that has "_hf" at the end. This comes from the health facility as opposed to from the drug information. 
+              - As of 28 June 2023: These scripts ignore the health facility data. 
