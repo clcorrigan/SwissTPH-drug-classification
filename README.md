@@ -6,7 +6,6 @@ A set of programs that are used to help automatically sort drug names that have 
 1. Overview Explaination of Code 
 2. Codebook and Data Requirements
 3. Files Funcionality 
-    - errorRate.py
     - fileReader.py
     - readToCSV.py
     - sortFreeText.py
@@ -78,3 +77,41 @@ Most of the time the codebook already matches the data so everything should be g
       1. One that has "_hf" at the end. This comes from the health facility as opposed to from the drug information. 
               - As of 28 June 2023: These scripts ignore the health facility data, hopefully by the end of the summer this shoudl be different
       2. One that does not have the "_hf" data, this is the data that is manipulated by this program. 
+
+## 3. File Functionality 
+
+### a. fileReader.py
+
+**functions included in fileReader.py**
+
+|function name|return value|
+| --- | --- |
+| get_filepath() | string, path to the .csv file of the data|
+| get_ft() | string of the file_type|
+| read_file(file_type) | returns a dictionary containing all of the data from the csv file| 
+| validate_file(file_type) | either reads the file and returns the dictionary or throws an error| 
+
+**use case of code**
+
+Used to read the csv file and return a dictionary. 
+As of right now it is only called in the selectData.py and sortFreeText.py python files. 
+
+**Common Bugs**
+- Not having the data in the correct format, a comma separated values 
+- Having errors in the filepath. The file path should be in the format with Users/username/downloads/.../file.csv 
+- Make sure to copy the entire file path. 
+
+### b. readToCSV 
+
+**functions included in readToCSV**
+
+| function name | return value | notes | 
+| --- | --- | --- | 
+| establish_file_path() | string of filepath | function to take user input of the file path to the location they want the file stored in | 
+| establish_file_name() | string of filename | function of the file name, not including the .csv ending | 
+| write_csv_file() | NA | calls est_file_path/name and uses these to write the dictionary of updated values to a CSV file and saves it in that location | 
+
+
+**use case of code**
+
+This is the main file. Just running this file effectively runs all other files. 
