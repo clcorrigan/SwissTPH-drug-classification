@@ -76,4 +76,5 @@ Because this project originally was working with the TIMICI data from Kenya, the
 Most of the time the codebook already matches the data so everything should be good.
 - Currently in the data there will be two different versions of drug data
       1. One that has "_hf" at the end. This comes from the health facility as opposed to from the drug information. 
-              - As of 28 June 2023: These scripts ignore the health facility data. 
+              - As of 28 June 2023: These scripts ignore the health facility data, hopefully by the end of the summer this shoudl be different
+      2. One that does not have the "_hf" data, this is the data that is manipulated by this program. 
