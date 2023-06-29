@@ -140,6 +140,7 @@ This code is used to categorize the freetext information.
 - It starts by reading the information in the freetext category and storing it in a variable freetext_entry (also called ft_entry)
 - It takes this information and then cleans the string and splits it into a list of strings, with each option on the list representing one of the drugs in the list. 
 - Then it looks through this list, and for any option that is also included in either the list of single select drugs or the list of multi-select drugs, it updates the patient data to represent those datatypes. 
+- This program includes a call to the selectData.py program (below), which is necessary because it needs to know which categories to look for when sorting the drug data. 
 
 **Common Bugs**
 
@@ -151,3 +152,17 @@ This code has not proved to be very buggy as of right now. There are a few centr
 - Some text that should be sorted is slipping through the cracks. 
     - As of 29 June, 2023: Some things that should be matching and getting categorized are slipping through the cracks. This is a bug that I am actively working on, and should be fixed soon. 
 
+### d. selectData.py 
+
+**Major Functions** 
+|Function| Return Value | notes | 
+| --- | --- | --- | 
+| select_db_names_to_sort(): | returns the dictionary of the multi-select options, a dict of the categorized_data, and a string representing the freetext category| This serves as the main function of this file  | 
+| codebook_and_db_names() | returns the codebook in a dictionary format, and a list of all the database names that freetext data should be sorted into |  |
+| sort_cats_auto(codebook, cats)| NA | "cats" is a shorter version of "categories
+ -- will be true for all subsequent functions | 
+| clean_cats(label) | returns a list of all the different spellings and classifications that one label of drug can have | | 
+
+**Use Case** 
+
+This program is used in preparation for the the 

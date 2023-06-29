@@ -17,8 +17,7 @@ def get_filepath():
 # returns the file type as a string 
 def get_ft():
     global filepath 
-    # filepath = input("Insert the file path of the data to be sorted: ")
-    filepath = "/Users/clairelichty/summer2023/SwissTPH/AutomatedClassification/02_timci_day0_data.xlsx - Sheet 1.csv"
+    filepath = input("Insert the file path of the data to be sorted: ")
     end_pattern = ".[a-z]+$" 
     file_type = (re.search(end_pattern, filepath)).group()
     return file_type 

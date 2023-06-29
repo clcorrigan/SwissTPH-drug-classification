@@ -27,7 +27,7 @@ def select_db_names_to_sort():
 
 def codebook_and_db_names():
     """
-    Performs two functino calls to get the information that is needed to call sort_cats_auto
+    Performs two function calls to get the information that is needed to call sort_cats_auto
     """
     db_names = select_cats() 
     cb = get_codebook()
@@ -86,7 +86,6 @@ def multi_select(codebook, i, label):
     while (all_values[i] != "96"): #Uses the value 96 because that is the value that is used to indicate "None of the above"
          multi[label["db_name"]][all_values[i]] = clean_cats(all_cats[i])
          i+=1
-    return multi 
 
 def list_categories_and_values(codebook):
     """
@@ -105,10 +104,8 @@ def single_select(item):
     categorized_data.keys() = database_names
     categorized_data.values() = lists of real drug names -- returned by clean_cats 
     """
-    categorized_data = {}
     label = item["label"]
     categorized_data[item["db_name"]] = clean_cats(label)
-    return categorized_data
 
 
 
@@ -130,3 +127,7 @@ def clean_cats(label):
             alt_drugs = [alt]
     drug_names_reg = label.split(" or ")
     return (drug_names_reg + alt_drugs)
+
+select_db_names_to_sort()
+print(multi)
+print(categorized_data)
