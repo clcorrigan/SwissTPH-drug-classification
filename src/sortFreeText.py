@@ -4,7 +4,7 @@ import selectData
 def main():
     global multi; global categorized_data; global freetext; 
     multi, categorized_data, freetext = selectData.select_db_names_to_sort() 
-    update_data()
+    return update_data()
 
 # read from free text and add that to a new dictionary 
 def update_data():
