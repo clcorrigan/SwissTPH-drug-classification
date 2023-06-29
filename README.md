@@ -13,7 +13,6 @@ A set of programs that are used to help automatically sort drug names that have 
 4. How to Install and Run the Project 
 5. External Libraries 
 6. Future Applications of the Code 
-7. Common bugs and trouble shooting 
 
 ## 1. Overview Explaination of Code 
 
@@ -117,7 +116,7 @@ As of right now it is only called in the selectData.py and sortFreeText.py pytho
 
 This is the main file. Just running this file effectively runs all other files. 
 
-**Common Bugs**
+**Common Bugs and Troubleshooting**
 
 - Not having the correct format for the location 
 - As of 29, June 2023: This doesn't check for/throw exceptions if there is an error in the path, will go to the end and then have an error in the code. Will break the process. 
@@ -128,7 +127,8 @@ This is the main file. Just running this file effectively runs all other files.
 
 |function name| return value| notes | 
 | --- | --- | --- |
-| update_data() | returns a dictionary of the updated data | This is the main function of this script. It contains all the others and calling it in another file effectively sort all the data and return it. | 
+|main()| returns updated data | also establishes global variables, multi, categorized_data, and freetext with the selectData program | 
+| update_data() | returns a dictionary of the updated data | | 
 | update_patient_data(patient) | updated patient data (dict) | |
 | sort_values(all_values_in_entry, patient_data) | updated patient data | in all subsequent functions, "entry" is used to refer to the freetext entry|
 | update_data_with_freetext(patient_data) | returns patient data | | 
@@ -142,7 +142,7 @@ This code is used to categorize the freetext information.
 - Then it looks through this list, and for any option that is also included in either the list of single select drugs or the list of multi-select drugs, it updates the patient data to represent those datatypes. 
 - This program includes a call to the selectData.py program (below), which is necessary because it needs to know which categories to look for when sorting the drug data. 
 
-**Common Bugs**
+**Common Bugs and Troubleshooting**
 
 This code has not proved to be very buggy as of right now. There are a few central areas that might need attention. 
 - In the list of "common_words" in the clean_data(ft_entry) function, some can be added or removed to tinker with this data to make it more accurate. 
@@ -159,10 +159,63 @@ This code has not proved to be very buggy as of right now. There are a few centr
 | --- | --- | --- | 
 | select_db_names_to_sort(): | returns the dictionary of the multi-select options, a dict of the categorized_data, and a string representing the freetext category| This serves as the main function of this file  | 
 | codebook_and_db_names() | returns the codebook in a dictionary format, and a list of all the database names that freetext data should be sorted into |  |
-| sort_cats_auto(codebook, cats)| NA | "cats" is a shorter version of "categories
+| sort_cats_auto(codebook, cats)| NA | "cats" is a shorter version of "categories"
  -- will be true for all subsequent functions | 
 | clean_cats(label) | returns a list of all the different spellings and classifications that one label of drug can have | | 
 
 **Use Case** 
 
-This program is used in preparation for the the 
+This program is used in preparation for the the sortFreeText.py function. It prepares two different data structures, one titled "multi" which is a dictionary containing the values and categories from the codebook. The other is called "categorized_data" and this refers to the single select categories, ie the drug values that have their own categories. 
+
+**Common Bugs and Troubleshooting**
+- The code relies on the format of the codebook being consistant of those from the TIMICI project, examples in the "codebook requirements" section.  
+    - Specifically, in the sort_cats_auto() function, it relies on "db_name", "type", and the types being either single or multiple. 
+- the function get_freetext_db_name relies on user input and as 29 June, 2023 does not have any exception throws. Something to work on. 
+- the clean_cats(label) function once again relies on the format of the codebook to be consistent. Once again, look at the "codebook requirements" section for more information. 
+- When the program prompts the user by asking for the db_name requirement, it is important to be syntactically precise. 
+
+## 4. How to Install and Run the Program 
+
+1. **Check the Codebook and Data Formats**
+- Before even touching this program, look over the "codebook and data requirements" section.
+- A few reminders of things to check: 
+    - All of the headers are spelled correctly 
+    - All possible spellings of a drug name are included 
+    - Drug names are separated by "OR" -- be sure to change this from OU or O if the codebook is originally in another language 
+
+2. **Download/Export the codebook and datatables in a .csv file**
+- As of 29 June, 2023 this program only works successfully with .csv files.
+- When you download these, put them in a folder. It can be helpful to put them in the same folder that the program is in. 
+    - Additional optional step at this point is copying the file paths of the two of these and saving them in a separate document that is easily accessable. 
+
+3. **Run readToCSV.py**
+- There are two ways to do this, one through a command line interface and one through an IDE 
+    - Command Line Interface: 
+        - If you are on Windows: Press Windows + R and type cmd into the dialog box that appears to open a new terminal. If you are using a Mac: open a terminal with the terminal app. 
+        - In the command line, type ls to look at what folder you are in. 
+        - use the "cd" command to navigate to the src file for the repository.  
+        - type the command *python readToCSV.py* and press enter. 
+
+    - In an IDE: 
+        - Open the repository in your chosen IDE (integrated development environment)
+            - common ones include VsCode, pyCharm, IntelliJ, you might have to copy from Github. 
+            - You can also download the source code from the switch drive. 
+        - Configure with python3.0 or later 
+        - run on the IDE 
+        - I find it works best with VsCode 
+4. **Insert the filepath of the patient data**
+- Once you run the program you should be propted to paste the file path to the patient database. This often will start with 02_
+- If you are getting an error and being asked to repeat the code, it's becuase there is an error in the file path or it is not in a .csv file. 
+
+5. **Insert the filepath to the codebook**
+- copy the path to the codebook when prompted. 
+- press enter. 
+
+6. **Provide the name for the freetext category**
+- Provide the name of the category that you are trying to fix. Often this is something like: 
+    - rx_misc_oth 
+    - rx_misc_oth_hf 
+
+7. **Provide the path to the folder where you want the returning .csv file to be created**
+- Pretty self explainatory, make sure that you are just providing the path correctly and in the correct syntax 
+- Once again exception throws have not been written yet (29/6/23) 
