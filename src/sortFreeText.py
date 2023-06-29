@@ -4,15 +4,6 @@ import selectData
 global multi; global categorized_data; global freetext; 
 multi, categorized_data, freetext = selectData.select_db_names_to_sort() 
 
-print("running sortFreeText.py")
-
-# print(freetext)
-
-global multi_catch; global cat_catch; global no_catch; 
-multi_catch = []; cat_catch = []; no_catch = []; 
-
-global count; count = 0; 
-
 # read from free text and add that to a new dictionary 
 def update_data():
     """
@@ -52,9 +43,6 @@ def update_data_with_freetext(patient_data, entry_drug_name):
         patient_data = add_to_cat_data(patient_data, entry_drug_name)
     elif entry_drug_name in get_multi_options():
         patient_data = add_to_multi_data(patient_data, entry_drug_name)
-    elif entry_drug_name != "":
-        if entry_drug_name not in no_catch:
-            no_catch.append(entry_drug_name)
     return patient_data
 
 

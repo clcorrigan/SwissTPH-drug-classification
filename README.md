@@ -82,6 +82,7 @@ Most of the time the codebook already matches the data so everything should be g
 
 ### a. fileReader.py
 
+
 **functions included in fileReader.py**
 
 |function name|return value|
@@ -101,7 +102,7 @@ As of right now it is only called in the selectData.py and sortFreeText.py pytho
 - Having errors in the filepath. The file path should be in the format with Users/username/downloads/.../file.csv 
 - Make sure to copy the entire file path. 
 
-### b. readToCSV 
+### b. readToCSV.py
 
 **functions included in readToCSV**
 
@@ -115,3 +116,38 @@ As of right now it is only called in the selectData.py and sortFreeText.py pytho
 **use case of code**
 
 This is the main file. Just running this file effectively runs all other files. 
+
+**Common Bugs**
+
+- Not having the correct format for the location 
+- As of 29, June 2023: This doesn't check for/throw exceptions if there is an error in the path, will go to the end and then have an error in the code. Will break the process. 
+
+### c. sortFreeText.py 
+
+**Functions Included**
+
+|function name| return value| notes | 
+| --- | --- | --- |
+| update_data() | returns a dictionary of the updated data | This is the main function of this script. It contains all the others and calling it in another file effectively sort all the data and return it. | 
+| update_patient_data(patient) | updated patient data (dict) | |
+| sort_values(all_values_in_entry, patient_data) | updated patient data | in all subsequent functions, "entry" is used to refer to the freetext entry|
+| update_data_with_freetext(patient_data) | returns patient data | | 
+| clean_entry(ft_entry) | returns the entry, split into the different drugs | | 
+
+**Use Case**
+
+This code is used to categorize the freetext information. 
+- It starts by reading the information in the freetext category and storing it in a variable freetext_entry (also called ft_entry)
+- It takes this information and then cleans the string and splits it into a list of strings, with each option on the list representing one of the drugs in the list. 
+- Then it looks through this list, and for any option that is also included in either the list of single select drugs or the list of multi-select drugs, it updates the patient data to represent those datatypes. 
+
+**Common Bugs**
+
+This code has not proved to be very buggy as of right now. There are a few central areas that might need attention. 
+- In the list of "common_words" in the clean_data(ft_entry) function, some can be added or removed to tinker with this data to make it more accurate. 
+    - As of 29 June, 2023: the list of "common words" is ["sp", "sirop", "cream", "lotion", "eye drops"]. These are words that are commonly added by the doctors in the freetext categories, but are not included in the codebook. 
+    - So far, there has not been reduction in accuracy by adding words to the list, but there *has* been accuracy reduction in removing them. 
+    - Additionally, the more words are on this list, the faster the program will run, however right now it is still pretty accurate. 
+- Some text that should be sorted is slipping through the cracks. 
+    - As of 29 June, 2023: Some things that should be matching and getting categorized are slipping through the cracks. This is a bug that I am actively working on, and should be fixed soon. 
+
