@@ -1,7 +1,6 @@
 import csv 
 import re
 import sortFreeText
-import fileReader 
 
 global updated_data; updated_data = sortFreeText.update_data(); 
 global dest_file_name; 

@@ -2,14 +2,14 @@ import re
 import csv 
 from enum import Enum 
 
-poss_fts = (".csv", ".xslx", ".json")
+poss_fts = (".csv")
 global filepath 
 global sheet_heads
 
 
 def get_dict():
     file_type = get_ft()
-    return choose_reader(file_type)
+    return validate_file(file_type)
 
 def get_filepath():
     return filepath
@@ -35,12 +35,12 @@ def read_file(file_type):
             return all_data_dict
 
 
-def choose_reader(file_type):
+def validate_file(file_type):
     if(poss_fts.count(file_type) != 0):
         # comment comment code code 
         return read_file(file_type) 
     else:
-        print("Not a valid file type. Only accepts files .csv, .xlsx, and .json")
+        print("Not a valid file type. Only accepts files .csv")
         print("Please try again")
         get_ft()            
 

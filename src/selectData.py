@@ -20,7 +20,8 @@ def select_db_names_to_sort():
     Looks through the codebook and selects all the drug categories. 
     27-06-23: Does not account for the _hf information 
     """
-    sort_cats_auto(codebook_and_db_names())
+    cb, cats = codebook_and_db_names()
+    sort_cats_auto(cb, cats)
     freetext = get_freetext_db_name()
     return multi, categorized_data, freetext
 
@@ -92,7 +93,7 @@ def list_categories_and_values(codebook):
     Goes through the codebook and returns all the categories and values in a list form. 
     """
     all_cats = []; all_values = []
-    for item in codebook():
+    for item in codebook:
         all_cats.append(item["category"]); all_values.append(item["value"])
     return all_cats, all_values 
 
