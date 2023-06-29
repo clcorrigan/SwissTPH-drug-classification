@@ -1,6 +1,8 @@
 # SwissTPH-drug-classification
 A set of programs that are used to help automatically sort drug names that have been inserted as freetext rather than selected from a drop down menu
 
+Date of Edit: 29/6/23 
+
 
 ## Table of Contents 
 1. Overview Explaination of Code 
@@ -13,6 +15,7 @@ A set of programs that are used to help automatically sort drug names that have 
 4. How to Install and Run the Project 
 5. External Libraries 
 6. Future Applications of the Code 
+7. Current Bugs
 
 ## 1. Overview Explaination of Code 
 
@@ -219,3 +222,28 @@ This program is used in preparation for the the sortFreeText.py function. It pre
 7. **Provide the path to the folder where you want the returning .csv file to be created**
 - Pretty self explainatory, make sure that you are just providing the path correctly and in the correct syntax 
 - Once again exception throws have not been written yet (29/6/23) 
+
+8. **Provide the file name when prompted**
+- When the program prompts, give the file name that you want the updated data to be saved as 
+- There is no need to include the .csv at the end, it will be automatically added 
+
+## 5. External Libraries 
+
+**None**
+
+## 6. Current Bugs and Troubleshooting 
+
+**Bugs**
+- 29/06/23: 3:37pm: Sometimes the code will ask you for the file name of the data and the CSV File multiple times, as well as the name of the freetext category. This is a simple fix, I just can't seem to find the place where these functions are being called more than once.
+- 20/06/23: 3:38pm: Issues with running the code on a Linux system vs a Windows System. Right now things are working on the Windows system, but there is an error reading the data file paths in Linux/Mac 
+
+**Troubleshooting**
+- Double/triple check that the file paths are correct. Most of the time when you select a file you can copy the file path, which is better than typing it by hand because that can create issues. 
+-  If you have a Linux system, I would recommend downloading Virtual Studio Code (VsCode) and running it on an IDE. This is an ad hoc solution and will hopefully be figured out more later. 
+
+Other bugs and ideas on how to fix them are in the indivdual file sections of the writeup. You can scroll up to go check those out. 
+
+## 7. Future applications 
+- Definitely works for the TIMICI study -- hopefully will work for other studies. 
+- Combining the health facility and non health facility information 
+- maybe can be reworked to also apply to diagnostic data. 
