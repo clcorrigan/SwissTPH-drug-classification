@@ -1,5 +1,6 @@
 import re 
 import csv 
+import readToCSV
 from enum import Enum 
 
 poss_fts = (".csv")
@@ -21,7 +22,7 @@ def get_filepath():
 # returns the file type as a string 
 def get_ft():
     global filepath 
-    filepath = input("Insert the file path of the data to be sorted: ")
+    filepath = "/Users/clairelichty/summer2023/SwissTPH/AutomatedClassification/PracticeData - Sheet1.csv"
     end_pattern = ".[a-z]+$" 
     file_type = (re.search(end_pattern, filepath)).group()
     return file_type 
@@ -47,3 +48,7 @@ def validate_file(file_type):
         print("Please try again")
         get_ft()            
 
+print(get_dict())
+
+readToCSV.set_updated_data(get_dict())
+readToCSV.write_csv_file()

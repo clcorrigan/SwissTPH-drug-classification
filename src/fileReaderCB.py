@@ -5,6 +5,10 @@ from enum import Enum
 poss_fts = (".csv", ".xslx", ".json")
 global filepath 
 global sheet_heads
+global all_data_dict
+
+def get_data():
+    return all_data_dict
 
 
 def get_dict():
@@ -28,6 +32,7 @@ def get_ft():
 # read_file takes in the file type and uses the global variable "filepath" to read the data into a dictionary. 
 # returns the data as a dictionary. 
 def read_file(file_type):
+    global all_data_dict
     if(file_type == ".csv"):
         with open(filepath) as csvfile:
             reader = csv.DictReader(csvfile, delimiter= ",")

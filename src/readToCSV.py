@@ -1,9 +1,12 @@
 import csv 
 import re
-import sortFreeText
 
-global updated_data; updated_data = sortFreeText.update_data(); 
+global updated_data; 
 global dest_file_name; 
+
+def set_updated_data(new_data):
+    global updated_data
+    updated_data = new_data
 
 def establish_file_path():
     dest_file_path = input("Please copy the path to the file where you would like to include the updated data: ")
@@ -23,7 +26,5 @@ def write_csv_file():
 
 
 def make_headers():
-    headers = updated_data[0].keys() 
+    headers = updated_data[0]
     return headers; 
-
-write_csv_file()

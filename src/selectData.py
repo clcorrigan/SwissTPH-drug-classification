@@ -7,12 +7,19 @@ global multi; global categorized_data; global freetext
 multi = {}
 categorized_data = {}
 
+def get_db_names_to_sort():
+    """
+    Simply a getter for other files in the program to use. Returns the multi, categorized_data, and freetext categories 
+    Will return nothing select_db_names_to_sort hasn't been used yet.  
+    """
+    return multi, categorized_data, freetext
+
 
 def get_codebook():
     """
     Works as a getter for the codebook in dictionary form. 
     """
-    codebook = fileReaderCB.get_dict() #gets the codebook from the codebook file reader. 
+    codebook = fileReaderCB.get_data() #gets the codebook from the codebook file reader. 
     return codebook #returns the codebook
 
 def select_db_names_to_sort():
@@ -20,6 +27,7 @@ def select_db_names_to_sort():
     Looks through the codebook and selects all the drug categories. 
     27-06-23: Does not account for the _hf information 
     """
+    global freetext
     cb, cats = codebook_and_db_names()
     sort_cats_auto(cb, cats)
     freetext = get_freetext_db_name()
@@ -34,16 +42,16 @@ def codebook_and_db_names():
     return cb, db_names
 
 
-def select_cats(cat_type = "^rx_"):
+def select_cats(cat_type = "^rx_", exclude = "_hf$"):
     """
     Takes in the category type, the default of this is 'rx', or drug types. 
     Returns a list of db_names, such as ['rx_amoxicillin', 'rx_penicillinG']
     """
-    data_table = fileReader.get_dict()
+    data_table = fileReader.get_data()
     db_name_categories = []
     for attribute in data_table[0]:
         if(re.search(cat_type, attribute) != None):
-            if(re.search("_hf$", attribute) == None):
+            if(re.search(exclude, attribute) == None):
                 db_name_categories.append(attribute)
     return(db_name_categories)
 
@@ -127,7 +135,3 @@ def clean_cats(label):
             alt_drugs = [alt]
     drug_names_reg = label.split(" or ")
     return (drug_names_reg + alt_drugs)
-
-select_db_names_to_sort()
-print(multi)
-print(categorized_data)

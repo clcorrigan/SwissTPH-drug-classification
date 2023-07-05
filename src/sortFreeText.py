@@ -1,17 +1,21 @@
 import fileReader
 import selectData
 
-def main():
-    global multi; global categorized_data; global freetext; 
-    multi, categorized_data, freetext = selectData.select_db_names_to_sort() 
-    return update_data()
+# def main():
+#     global multi; global single_select; global freetext; 
+#     multi, single_select, freetext = selectData.select_db_names_to_sort() 
+#     return update_data(multi, single_select, freetext)
+
+global multi; global single_select; global freetext; 
 
 # read from free text and add that to a new dictionary 
-def update_data():
+def update_data(multi_ext, single_select_ext, freetext_ext):
+    global multi; global single_select; global freetext; 
+    multi = multi_ext; single_select = single_select_ext; freetext = freetext_ext; 
     """
     The main function to run -- updates all the data and returns the updated data. 
     """
-    global updated_data; updated_data = fileReader.get_dict()
+    global updated_data; updated_data = fileReader.get_data()
     for patient in updated_data:
         patient = update_patient_data(patient)
     return updated_data 
@@ -86,7 +90,7 @@ def all_cat_opts():
     Gets all the categorical data options as a list
     """
     all_cat_opts = []
-    for item in categorized_data.values():
+    for item in single_select.values():
         all_cat_opts += item
     return all_cat_opts
 
@@ -110,9 +114,9 @@ def add_to_cat_data(patient_data, freetext_entry):
     """
     Updates the patient data to correctly account for the freetext_entry. 
     """
-    for drug_name, list in categorized_data.items():
+    for drug_name, list in single_select.items():
         if freetext_entry in list:
-            if(patient_data[drug_name] == "0" | patient_data[drug_name] == ""):
+            if((patient_data[drug_name] == "0" )| (patient_data[drug_name] == "")):
                 patient_data[drug_name] = "1"        
     return patient_data 
 
