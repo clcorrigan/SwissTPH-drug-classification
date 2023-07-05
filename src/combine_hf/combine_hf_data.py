@@ -3,7 +3,7 @@ import sort_non_hf
 
 global hf_data; global non_hf_data; global combined_data; 
 
-combined_data_db_names = ["fid"]
+combined_data_db_names = ["child_id"]
 old_data_names = []
 combined_data = []
 
