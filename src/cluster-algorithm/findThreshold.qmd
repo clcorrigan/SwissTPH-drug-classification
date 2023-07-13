@@ -1,0 +1,144 @@
+---
+title: "Classifying the Data"
+format:
+    html:
+        code-fold: true 
+        code-tools: true
+        df-print: paged
+jupyter: python3 
+---
+
+1. Loading the cleaned data sets. Change the file path to match the one that you need. 
+    - selecting the necessary columns 
+    - filtering out values that are null on dx_oth
+
+```{python}
+#| label: raw-data 
+#| fig-cap: "The raw data when loaded from the CSV file"
+
+import pandas as pd
+import matplotlib.pyplot as plt
+
+filepath = "/Users/clairelichty/summer2023/SwissTPH/AutomatedClassification/02_timci_day0_data.csv"
+raw_df = pd.read_csv(filepath, low_memory=False)
+df = pd.DataFrame(raw_df, columns = ["dx_oth", "child_id"])
+data_to_be_sorted = df[(df.dx_oth.notnull())]
+data_to_be_sorted
+```
+
+2. Start by creating the data structure that is going to be used to sort the items in the dataset 
+
+
+```{python}
+    df_with_buckets = pd.DataFrame(columns = ["dx_oth", "child_id", "category_no"])
+    df_with_buckets
+```
+
+3. Iterate through the list, if there is nothing already in the dataframe, as there is the first time, add it to the dataframe. 
+    - The Category No. being one here means that this represents the first category, in order for something else to "qualify" for that category, it has to hit certain criteria, which are laid out in the function under point number 4. 
+
+```{python}
+    for dx_oth, child_id in zip(data_to_be_sorted["dx_oth"], data_to_be_sorted["child_id"]):
+        if len(df_with_buckets) == 0: 
+            df_with_buckets.loc[0] = [dx_oth, child_id, 1]
+        else: 
+            patient_data = (dx_oth, child_id)
+    df_with_buckets
+```
+
+4. Comparing to the criteria
+    - This function will take in the patient_data, as the tuple (dx_oth, child_id) and it will decide which bucket to place it in, or if to make a new bucket with it. 
+        - The criteria to place a word in a bucket is that it has to pass at least 2 out of 3 thresholds: 
+            - Lavenshtein Ratio, Jaro-Winkler Distance, and N-Gram Similarity
+        - After running the program on the data from the most recent (as of 06/07/23) TIMCI data from Kenya, the following data was produced: 
+
+```{python}
+import classificationEquations 
+buckets = [1]
+for row in data_to_be_sorted.itertuples():
+    i = 0
+    cat_num = 0
+    no_match_cat = 0
+    for row_sorted in df_with_buckets.itertuples():
+        if(no_match_cat == row_sorted.dx_oth): continue; 
+        i+=1; 
+
+        jaro_dist = classificationEquations.get_jaro_distance(row.dx_oth, row_sorted.dx_oth)
+        lev_dist = classificationEquations.get_lev_distance(row.dx_oth, row_sorted.dx_oth)
+        ngram_dist = classificationEquations.get_ngram_distance(row.dx_oth, row_sorted.dx_oth)
+
+        total_dist = jaro_dist + lev_dist + ngram_dist
+
+        # jaro = classificationEquations.compare_with_jar(row.dx_oth, row_sorted.dx_oth)
+        # lev = classificationEquations.compare_with_lev(row.dx_oth, row_sorted.dx_oth)
+        # ngram = classificationEquations.compare_with_ngram(row.dx_oth, row_sorted.dx_oth)         
+
+        # if(jaro and lev and ngram):
+        # if((jaro and lev) or (jaro and ngram) or (lev and ngram)):
+
+        if(total_dist < 1.0):
+            # means that this has "passed" the requirements to enter a bucket. 
+            ## establishes that this is the category number that fits for this data. Have to check with the rest of the category. 
+            cat_num = row_sorted.category_no 
+            df_with_buckets.loc[len(df_with_buckets)] = [row.dx_oth, row.child_id, cat_num]
+            break 
+        else:
+        #     ## they did not pass the test, should check if you're at the end of the list.
+            if( i == len(df_with_buckets)):
+        #         row_to_add = {"dx_oth": row.dx_oth, "child_id": row.child_id, "category_no": row_sorted.category_no + 1}
+                 cat_num = max(buckets) + 1
+                 buckets.append(cat_num)
+                 df_with_buckets.loc[len(df_with_buckets)] = [row.dx_oth, row.child_id, cat_num]
+                 break
+            else: 
+                no_match_cat = row_sorted.category_no
+            
+df_with_buckets
+```
+
+On examining these categorizations, we can evaluate whether or not the current thresholds are effective for distingushing between words. Specifically considering how they compare to the IMCI and ICD-11 standards.  
+
+``` {python}
+import compareToStandards
+import statistics
+
+list_of_dfs = []
+dx_entry_per_category = {}
+for cat_no in buckets:
+    list_of_dfs.append(df_with_buckets[df_with_buckets["category_no"] == cat_no])
+
+compareToStandards.readfile()
+
+ranges = []
+
+for df in list_of_dfs:    
+    cat_no = df.iloc[0].category_no 
+    num_entries = len(df)
+    dx_entry_per_category[cat_no] = num_entries
+    compareToStandards.compare_with_df(df)
+    ranges.append(compareToStandards.find_range(df))
+
+print(statistics.mean(ranges))
+
+invalid_cats = 0
+for range in ranges:
+    if (range > 1.5 ):
+        invalid_cats += 1 
+
+print(invalid_cats)
+
+sort_count = compareToStandards.get_sorting_count()
+
+print(dx_entry_per_category)
+print(470/len(dx_entry_per_category))
+print(statistics.pstdev(dx_entry_per_category.values()))
+
+adding = 0 
+for values in dx_entry_per_category.values():
+    if values == 1:
+        adding += 1; 
+
+print(adding)
+
+
+```
