@@ -47,6 +47,4 @@ def confirm_categories(sorted_data):
     return labeled_data
 
 
-main() 
-
-
+labeled_data = main()
