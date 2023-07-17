@@ -4,20 +4,6 @@ import csv
 
 def main():
     df = sd.read_file() 
-    # sd.initiate_buckets()
-    # sd.data_iterator(df)
-    # sorted_data = sd.get_buckets()
-
-
-    ## Evaluate the sorting of the algorithm 
-
-    # scores = []
-    # for i in range (0, 20):
-    #     thresh = sd.set_threshold(0.5 + (i * 0.1)) 
-    #     sd.data_iterator(df)
-    #     sorted_data = sd.get_buckets()
-    #     scores.append(eval.find_outliars_dict(sorted_data))
-    # print(scores)
 
     sd.clear_buckets()
     sd.initiate_buckets()
@@ -44,7 +30,8 @@ def main():
         writer = csv.DictWriter(csvfile, fieldnames = ["category", "child_id", "dx_oth"])
         writer.writeheader()
         writer.writerows(dict_to_convert)
-    confirm_categories(sorted_data)
+        
+    return confirm_categories(sorted_data)
 
 def confirm_categories(sorted_data):
     labeled_data = {}
@@ -57,6 +44,8 @@ def confirm_categories(sorted_data):
                 labeled_data[id]= {"Child_id": id, "dx_oth" : data, "label": label}
         elif(action != "3"):
             print("Please select either 1, 2, or 3, from the dataset")
+    return labeled_data
+
 
 main() 
 

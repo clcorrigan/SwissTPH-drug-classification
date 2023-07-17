@@ -1,4 +1,4 @@
-import combine_hf.sort_hf 
+import sort_hf 
 import sort_non_hf 
 
 global hf_data; global non_hf_data; global combined_data; 
@@ -13,7 +13,7 @@ def get_updated_dict():
 
 def set_data_sets():
     global hf_data; global non_hf_data; 
-    hf_data = combine_hf.sort_hf.get_updated_hf_data()
+    hf_data = sort_hf.get_updated_hf_data()
     non_hf_data = sort_non_hf.get_updated_data()
 
 def create_updated_dict():
@@ -36,6 +36,7 @@ def make_new_db_names():
         old_data_names.append(db_name)
     combined_data_db_names.append(freetext + "_new")
     old_data_names.append(freetext)
+
     # combined_data.append(combined_data_db_names)
 
 
@@ -44,25 +45,33 @@ def check_hf_and_reg():
     this function iterates through the multi_select options from both the hf and non hf data, and then checks if there is a difference in the marking of these categories. 
     """
     for patient_data in hf_data:
-        new_patient_data = {"fid": patient_data["fid"]}
+        new_patient_data = {"child_id": patient_data["child_id"]}
         for db_name in patient_data.keys():
             if db_name in old_data_names:
-                hf_value = patient_data[db_name] 
-                reg_value = patient_data[db_name]
+                try:
+                    hf_value = patient_data[db_name + "_hf"] 
+                    reg_value = patient_data[db_name]
+                    new_pat_data = check_null_and_add(hf_value, reg_value, db_name, new_patient_data)
+                except KeyError:
+                    add_data_to_new_cat(db_name, new_patient_data, patient_data[db_name])
                 # This is checking if any of the values, either the hf or regular value isn't null
-                if values_are_not_null(hf_value, reg_value):
-                    new_val = combine_data(hf_value, reg_value)
-                    add_combined_data_to_new_cat(db_name, new_patient_data, new_val)
-                else:
-                    add_data_to_new_cat(db_name, new_patient_data, reg_value)
+                
         combined_data.append(new_patient_data)
+
+def check_null_and_add(hf, reg, db_name, new_patient_data):
+    if values_are_not_null(hf, reg):
+        new_val = combine_data(hf, reg)
+        add_combined_data_to_new_cat(db_name, new_patient_data, new_val)
+    else:
+        add_data_to_new_cat(db_name, new_patient_data, reg)
+
         
 
 def values_are_not_null(hf, reg):
     """
     This checks the hf_values and the reg values 
     """
-    return ((hf!= "0" )| (reg != "0") | (hf == "" )| (reg == "") | (reg == "96") | (reg == "96"))
+    return ((hf!= "0" ) or (reg != "0") or (hf == "" ) or (reg == "") or (reg == "96") or (reg == "96"))
 
 
 def combine_data(hf, reg):
@@ -72,8 +81,8 @@ def combine_data(hf, reg):
     Returns the value to the function that called it. 
     """
     if(hf == reg):
-        new_val = hf 
-    elif (hf == "1" | reg == "1"):
+        new_val = hf
+    elif (hf == "1" or reg == "1"):
         new_val = "1"
     else: 
         # In this case, the hf and reg are in an additional category and there are certain values that are not in it. 

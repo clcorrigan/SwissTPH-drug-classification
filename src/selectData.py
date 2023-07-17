@@ -70,6 +70,8 @@ def sort_cats_auto(codebook, cats):
             elif(item["type"] == "multiple"):
                 multi[item["db_name"]] = {}
                 multi_select(codebook, i, item)
+            else:
+                print(item)
         i+=1
     
     
