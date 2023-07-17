@@ -20,7 +20,7 @@ def get_threshold():
 
 def read_file():
     # when reading this file, this choses the free text and the child_id columns. The child_id will serve as a unique key for each patient 
-    filepath = "/Users/clairelichty/summer2023/SwissTPH/AutomatedClassification/02_timci_day0_data.csv"
+    filepath = "/Users/clairelichty/summer2023/SwissTPH/SwissTPH-drug-classification/02_timci_day0_data.csv"
     raw_df = pd.read_csv(filepath, low_memory=False)
     df = pd.DataFrame(raw_df, columns = ["dx_oth", "child_id"])
     df = df[(df.dx_oth.notnull())]
