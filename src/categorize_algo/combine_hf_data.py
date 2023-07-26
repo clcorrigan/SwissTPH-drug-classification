@@ -42,7 +42,7 @@ def make_new_db_names():
 
 def check_hf_and_reg():
     """
-    this function iterates through the multi_select options from both the hf and non hf data, and then checks if there is a difference in the marking of these categories. 
+    this function iterates through the options from both the hf and non hf data, and then checks if there is a difference in the marking of these categories. 
     """
     for patient_data in hf_data:
         new_patient_data = {"child_id": patient_data["child_id"]}
@@ -51,7 +51,7 @@ def check_hf_and_reg():
                 try:
                     hf_value = patient_data[db_name + "_hf"] 
                     reg_value = patient_data[db_name]
-                    new_pat_data = check_null_and_add(hf_value, reg_value, db_name, new_patient_data)
+                    check_null_and_add(hf_value, reg_value, db_name, new_patient_data)
                 except KeyError:
                     add_data_to_new_cat(db_name, new_patient_data, patient_data[db_name])
                 # This is checking if any of the values, either the hf or regular value isn't null
@@ -60,7 +60,7 @@ def check_hf_and_reg():
 
 def check_null_and_add(hf, reg, db_name, new_patient_data):
     if values_are_not_null(hf, reg):
-        new_val = combine_data(hf, reg)
+        new_val = combine_data(hf, reg, db_name)
         add_combined_data_to_new_cat(db_name, new_patient_data, new_val)
     else:
         add_data_to_new_cat(db_name, new_patient_data, reg)
@@ -74,15 +74,17 @@ def values_are_not_null(hf, reg):
     return ((hf!= "0" ) or (reg != "0") or (hf == "" ) or (reg == "") or (reg == "96") or (reg == "96"))
 
 
-def combine_data(hf, reg):
+def combine_data(hf, reg, db_name):
+    multi, single, free = sort_non_hf.get_var_names()
     new_val = ""
     """
     Combine data between the hf_value and the reg_values by being "greedy" 
     Returns the value to the function that called it. 
+    Right now causes an error where it mischaracterizes data as being "1"
     """
     if(hf == reg):
         new_val = hf
-    elif (hf == "1" or reg == "1"):
+    elif ((hf == "1" or reg == "1") and db_name in single):
         new_val = "1"
     else: 
         # In this case, the hf and reg are in an additional category and there are certain values that are not in it. 

@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>readme</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="README_files/libs/clipboard/clipboard.min.js"></script>
+<script src="README_files/libs/quarto-html/quarto.js"></script>
+<script src="README_files/libs/quarto-html/popper.min.js"></script>
+<script src="README_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="README_files/libs/quarto-html/anchor.min.js"></script>
+<link href="README_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="README_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="README_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="README_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="README_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+
+
+<section id="swisstph-drug-classification" class="level1">
+<h1>SwissTPH-drug-classification</h1>
+<p>A set of programs that are used to help automatically sort drug names that have been inserted as freetext rather than selected from a drop down menu</p>
+<p>Date of Edit: 29/6/23</p>
+<section id="table-of-contents" class="level2">
+<h2 class="anchored" data-anchor-id="table-of-contents">Table of Contents</h2>
+<ol type="1">
+<li>Overview Explaination of Code</li>
+<li>Codebook and Data Requirements</li>
+<li>Files Funcionality
+<ul>
+<li>fileReader.py</li>
+<li>readToCSV.py</li>
+<li>sortFreeText.py</li>
+<li>verifyData.py</li>
+</ul></li>
+<li>How to Install and Run the Project</li>
+<li>External Libraries</li>
+<li>Future Applications of the Code</li>
+<li>Current Bugs</li>
+</ol>
+</section>
+<section id="overview-explaination-of-code" class="level2">
+<h2 class="anchored" data-anchor-id="overview-explaination-of-code">1. Overview Explaination of Code</h2>
+<p>In this project, the goal of the code is to take in input: - in one CSV file containing patient data, - one CSV file that is the code book - the db_name (database name) of the freetext category that needs to be updated</p>
+<p>and output: - CSV file with more accurate drug data in the same format as the patient data input</p>
+<p>The motivation behind this data was to more easily utilize the free text data. - As of 28 June, 2023, this proved significantly effective: - On 500 randomly selected patients: Before the running on the program, the freetext category was accounted for correctly 82.4% of the time After running the program, the freetext category was accounted for correctly 95.8% of the time. - There were 67 instances of the program correctly sorting freetext (going from incorrect to correct) - There were 0 instances of the program incorrectly sorting freetext (going from correct to incorrect) - There were 21 missed instances of sorting freetext (going from incorrect to incorrect)</p>
+</section>
+<section id="codebook-and-data-requirements" class="level2">
+<h2 class="anchored" data-anchor-id="codebook-and-data-requirements">2. Codebook and Data Requirements</h2>
+<p>Because this project reads directly from the codebook and the patient data information, it requires these to be in a specific format.</p>
+<section id="codebook-requirements" class="level3">
+<h3 class="anchored" data-anchor-id="codebook-requirements">Codebook Requirements</h3>
+<p>Because this project originally was working with the TIMICI data from Kenya, the codebook from that data set is what the code knows how to read from.</p>
+<ul>
+<li>A format of the code is included below</li>
+</ul>
+<table class="table">
+<colgroup>
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 16%">
+<col style="width: 24%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>name</th>
+<th>db_name</th>
+<th>label</th>
+<th>type</th>
+<th>ref</th>
+<th>value</th>
+<th>category</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>amoxicillin</td>
+<td>rx_amoxicillin</td>
+<td>Amoxicillin (Amox) OR Amoxil</td>
+<td>single</td>
+<td>YESNO</td>
+<td>1</td>
+<td>YES</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>0</td>
+<td>NO</td>
+</tr>
+<tr class="odd">
+<td>antimicrobials</td>
+<td>rx_antibio_oth</td>
+<td>k10) Please indicate whether the following items are among the items listed on the drug prescriptions</td>
+<td>multiple</td>
+<td>ANTIMICROBIALS</td>
+<td>107</td>
+<td>Acylovir</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>80</td>
+<td>Amikacin (AM)</td>
+</tr>
+<tr class="odd">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>108</td>
+<td>Aminosidine OR Daboral</td>
+</tr>
+<tr class="even">
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td>81</td>
+<td>Cefezolin</td>
+</tr>
+</tbody>
+</table>
+<p><strong>There are a few important things to note here</strong> 1. Each separate category has it’s own row in the codebook. The format is not such that there is one cell that has all the data in one block</p>
+<pre><code>Example:
+    "75=Céfadroxil OU Oracéfal|55=Céfixime OU Oroken OU Ofiken OU Fixim|63=Doxycycline OU Vibra|64=Erythromycine (Ery)|65=Flucloxacilline OU Staphypen OU Flustaph|67=Isoniazide (sans rifampicine, etc) OU Rimifon|68=Mupirocine OU Bactroban|70=Phénoxyméthylpénicilline OU Ospen|71=Rifampicine (sans isoniazide etc) OU Rimactan|38=Rifampicine / Isoniazide (RH)|39=Rifampicine / Isoniazide / Pyrazinamide / Ethambutol (RHZE) OU Lamprène|74=Chlortétracycline OU Tétracycline OU Auréomycine|96=Aucun des éléments ci-dessus "</code></pre>
+<ul>
+<li>All being in the “value” category would not work and would lead to errors.<br>
+</li>
+</ul>
+<ol start="2" type="1">
+<li>For cells that hold multiple different drug names that apply to a specific category or value
+<ul>
+<li>Each value needs to be seperated by an OR, either uppercase or lower case
+<ul>
+<li>If you are using the codebook from a language is not English, you need to go and change the values between drugs to be OR</li>
+<li>This does not apply for drugs that are in parentheses, for example (Amox)</li>
+</ul></li>
+</ul></li>
+<li>The headers that matter are db_name, label, type, value, and category - If the headers are not spelled this way exactly</li>
+<li>Drug name spellings matter, but things are not case sensitive
+<ul>
+<li>If you have drug names that are in an language that uses accents, go back in the drug information and include spellings both with and without accents - Example - Change “Céfadroxil OR Oracéfal” to be “Céfadroxil OR Oracéfal OR Cefadroxil OR Oracefal”</li>
+<li>If there are common acronyms or alternate spellings include those as well</li>
+<li>You do not need to account for capital or lowercase letters</li>
+</ul></li>
+</ol>
+</section>
+<section id="data-requirements" class="level3">
+<h3 class="anchored" data-anchor-id="data-requirements">Data Requirements</h3>
+<p>Most of the time the codebook already matches the data so everything should be good. - Currently in the data there will be two different versions of drug data 1. One that has “_hf” at the end. This comes from the health facility as opposed to from the drug information. - As of 28 June 2023: These scripts ignore the health facility data, hopefully by the end of the summer this shoudl be different 2. One that does not have the “_hf” data, this is the data that is manipulated by this program.</p>
+</section>
+</section>
+<section id="file-functionality" class="level2">
+<h2 class="anchored" data-anchor-id="file-functionality">3. File Functionality</h2>
+<section id="a.-filereader.py" class="level3">
+<h3 class="anchored" data-anchor-id="a.-filereader.py">a. fileReader.py</h3>
+<p><strong>functions included in fileReader.py</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 50%">
+<col style="width: 50%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>function name</th>
+<th>return value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>get_filepath()</td>
+<td>string, path to the .csv file of the data</td>
+</tr>
+<tr class="even">
+<td>get_ft()</td>
+<td>string of the file_type</td>
+</tr>
+<tr class="odd">
+<td>read_file(file_type)</td>
+<td>returns a dictionary containing all of the data from the csv file</td>
+</tr>
+<tr class="even">
+<td>validate_file(file_type)</td>
+<td>either reads the file and returns the dictionary or throws an error</td>
+</tr>
+</tbody>
+</table>
+<p><strong>use case of code</strong></p>
+<p>Used to read the csv file and return a dictionary. As of right now it is only called in the selectData.py and sortFreeText.py python files.</p>
+<p><strong>Common Bugs</strong> - Not having the data in the correct format, a comma separated values - Having errors in the filepath. The file path should be in the format with Users/username/downloads/…/file.csv - Make sure to copy the entire file path.</p>
+</section>
+<section id="b.-readtocsv.py" class="level3">
+<h3 class="anchored" data-anchor-id="b.-readtocsv.py">b. readToCSV.py</h3>
+<p><strong>functions included in readToCSV</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>function name</th>
+<th>return value</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>establish_file_path()</td>
+<td>string of filepath</td>
+<td>function to take user input of the file path to the location they want the file stored in</td>
+</tr>
+<tr class="even">
+<td>establish_file_name()</td>
+<td>string of filename</td>
+<td>function of the file name, not including the .csv ending</td>
+</tr>
+<tr class="odd">
+<td>write_csv_file()</td>
+<td>NA</td>
+<td>calls est_file_path/name and uses these to write the dictionary of updated values to a CSV file and saves it in that location</td>
+</tr>
+</tbody>
+</table>
+<p><strong>use case of code</strong></p>
+<p>This is the main file. Just running this file effectively runs all other files.</p>
+<p><strong>Common Bugs and Troubleshooting</strong></p>
+<ul>
+<li>Not having the correct format for the location</li>
+<li>As of 29, June 2023: This doesn’t check for/throw exceptions if there is an error in the path, will go to the end and then have an error in the code. Will break the process.</li>
+</ul>
+</section>
+<section id="c.-sortfreetext.py" class="level3">
+<h3 class="anchored" data-anchor-id="c.-sortfreetext.py">c.&nbsp;sortFreeText.py</h3>
+<p><strong>Functions Included</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>function name</th>
+<th>return value</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>main()</td>
+<td>returns updated data</td>
+<td>also establishes global variables, multi, categorized_data, and freetext with the selectData program</td>
+</tr>
+<tr class="even">
+<td>update_data()</td>
+<td>returns a dictionary of the updated data</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>update_patient_data(patient)</td>
+<td>updated patient data (dict)</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>sort_values(all_values_in_entry, patient_data)</td>
+<td>updated patient data</td>
+<td>in all subsequent functions, “entry” is used to refer to the freetext entry</td>
+</tr>
+<tr class="odd">
+<td>update_data_with_freetext(patient_data)</td>
+<td>returns patient data</td>
+<td></td>
+</tr>
+<tr class="even">
+<td>clean_entry(ft_entry)</td>
+<td>returns the entry, split into the different drugs</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Use Case</strong></p>
+<p>This code is used to categorize the freetext information. - It starts by reading the information in the freetext category and storing it in a variable freetext_entry (also called ft_entry) - It takes this information and then cleans the string and splits it into a list of strings, with each option on the list representing one of the drugs in the list. - Then it looks through this list, and for any option that is also included in either the list of single select drugs or the list of multi-select drugs, it updates the patient data to represent those datatypes. - This program includes a call to the selectData.py program (below), which is necessary because it needs to know which categories to look for when sorting the drug data.</p>
+<p><strong>Common Bugs and Troubleshooting</strong></p>
+<p>This code has not proved to be very buggy as of right now. There are a few central areas that might need attention. - In the list of “common_words” in the clean_data(ft_entry) function, some can be added or removed to tinker with this data to make it more accurate. - As of 29 June, 2023: the list of “common words” is [“sp”, “sirop”, “cream”, “lotion”, “eye drops”]. These are words that are commonly added by the doctors in the freetext categories, but are not included in the codebook. - So far, there has not been reduction in accuracy by adding words to the list, but there <em>has</em> been accuracy reduction in removing them. - Additionally, the more words are on this list, the faster the program will run, however right now it is still pretty accurate. - Some text that should be sorted is slipping through the cracks. - As of 29 June, 2023: Some things that should be matching and getting categorized are slipping through the cracks. This is a bug that I am actively working on, and should be fixed soon.</p>
+</section>
+<section id="d.-selectdata.py" class="level3">
+<h3 class="anchored" data-anchor-id="d.-selectdata.py">d.&nbsp;selectData.py</h3>
+<p><strong>Major Functions</strong></p>
+<table class="table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Function</th>
+<th>Return Value</th>
+<th>notes</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>select_db_names_to_sort():</td>
+<td>returns the dictionary of the multi-select options, a dict of the categorized_data, and a string representing the freetext category</td>
+<td>This serves as the main function of this file</td>
+</tr>
+<tr class="even">
+<td>codebook_and_db_names()</td>
+<td>returns the codebook in a dictionary format, and a list of all the database names that freetext data should be sorted into</td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>sort_cats_auto(codebook, cats)</td>
+<td>NA</td>
+<td>“cats” is a shorter version of “categories”</td>
+</tr>
+<tr class="even">
+<td>– will be true for all subsequent functions</td>
+<td></td>
+<td></td>
+</tr>
+<tr class="odd">
+<td>clean_cats(label)</td>
+<td>returns a list of all the different spellings and classifications that one label of drug can have</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Use Case</strong></p>
+<p>This program is used in preparation for the the sortFreeText.py function. It prepares two different data structures, one titled “multi” which is a dictionary containing the values and categories from the codebook. The other is called “categorized_data” and this refers to the single select categories, ie the drug values that have their own categories.</p>
+<p><strong>Common Bugs and Troubleshooting</strong> - The code relies on the format of the codebook being consistant of those from the TIMICI project, examples in the “codebook requirements” section.<br>
+- Specifically, in the sort_cats_auto() function, it relies on “db_name”, “type”, and the types being either single or multiple. - the function get_freetext_db_name relies on user input and as 29 June, 2023 does not have any exception throws. Something to work on. - the clean_cats(label) function once again relies on the format of the codebook to be consistent. Once again, look at the “codebook requirements” section for more information. - When the program prompts the user by asking for the db_name requirement, it is important to be syntactically precise.</p>
+</section>
+</section>
+<section id="how-to-install-and-run-the-program" class="level2">
+<h2 class="anchored" data-anchor-id="how-to-install-and-run-the-program">4. How to Install and Run the Program</h2>
+<ol type="1">
+<li><strong>Check the Codebook and Data Formats</strong></li>
+</ol>
+<ul>
+<li>Before even touching this program, look over the “codebook and data requirements” section.</li>
+<li>A few reminders of things to check:
+<ul>
+<li>All of the headers are spelled correctly</li>
+<li>All possible spellings of a drug name are included</li>
+<li>Drug names are separated by “OR” – be sure to change this from OU or O if the codebook is originally in another language</li>
+</ul></li>
+</ul>
+<ol start="2" type="1">
+<li><strong>Download/Export the codebook and datatables in a .csv file</strong></li>
+</ol>
+<ul>
+<li>As of 29 June, 2023 this program only works successfully with .csv files.</li>
+<li>When you download these, put them in a folder. It can be helpful to put them in the same folder that the program is in.
+<ul>
+<li>Additional optional step at this point is copying the file paths of the two of these and saving them in a separate document that is easily accessable.</li>
+</ul></li>
+</ul>
+<ol start="3" type="1">
+<li><strong>Run readToCSV.py</strong></li>
+</ol>
+<ul>
+<li>There are two ways to do this, one through a command line interface and one through an IDE
+<ul>
+<li>Command Line Interface:
+<ul>
+<li>If you are on Windows: Press Windows + R and type cmd into the dialog box that appears to open a new terminal. If you are using a Mac: open a terminal with the terminal app.</li>
+<li>In the command line, type ls to look at what folder you are in.</li>
+<li>use the “cd” command to navigate to the src file for the repository.<br>
+</li>
+<li>type the command <em>python readToCSV.py</em> and press enter.</li>
+</ul></li>
+<li>In an IDE:
+<ul>
+<li>Open the repository in your chosen IDE (integrated development environment)
+<ul>
+<li>common ones include VsCode, pyCharm, IntelliJ, you might have to copy from Github.</li>
+<li>You can also download the source code from the switch drive.</li>
+</ul></li>
+<li>Configure with python3.0 or later</li>
+<li>run on the IDE</li>
+<li>I find it works best with VsCode</li>
+</ul></li>
+</ul></li>
+</ul>
+<ol start="4" type="1">
+<li><strong>Insert the filepath of the patient data</strong></li>
+</ol>
+<ul>
+<li>Once you run the program you should be propted to paste the file path to the patient database. This often will start with 02_</li>
+<li>If you are getting an error and being asked to repeat the code, it’s becuase there is an error in the file path or it is not in a .csv file.</li>
+</ul>
+<ol start="5" type="1">
+<li><strong>Insert the filepath to the codebook</strong></li>
+</ol>
+<ul>
+<li>copy the path to the codebook when prompted.</li>
+<li>press enter.</li>
+</ul>
+<ol start="6" type="1">
+<li><strong>Provide the name for the freetext category</strong></li>
+</ol>
+<ul>
+<li>Provide the name of the category that you are trying to fix. Often this is something like:
+<ul>
+<li>rx_misc_oth</li>
+<li>rx_misc_oth_hf</li>
+</ul></li>
+</ul>
+<ol start="7" type="1">
+<li><strong>Provide the path to the folder where you want the returning .csv file to be created</strong></li>
+</ol>
+<ul>
+<li>Pretty self explainatory, make sure that you are just providing the path correctly and in the correct syntax</li>
+<li>Once again exception throws have not been written yet (29/6/23)</li>
+</ul>
+<ol start="8" type="1">
+<li><strong>Provide the file name when prompted</strong></li>
+</ol>
+<ul>
+<li>When the program prompts, give the file name that you want the updated data to be saved as</li>
+<li>There is no need to include the .csv at the end, it will be automatically added</li>
+</ul>
+</section>
+<section id="external-libraries" class="level2">
+<h2 class="anchored" data-anchor-id="external-libraries">5. External Libraries</h2>
+<p><strong>None</strong></p>
+</section>
+<section id="current-bugs-and-troubleshooting" class="level2">
+<h2 class="anchored" data-anchor-id="current-bugs-and-troubleshooting">6. Current Bugs and Troubleshooting</h2>
+<p><strong>Bugs</strong> - 29/06/23: 3:37pm: Sometimes the code will ask you for the file name of the data and the CSV File multiple times, as well as the name of the freetext category. This is a simple fix, I just can’t seem to find the place where these functions are being called more than once. - 20/06/23: 3:38pm: Issues with running the code on a Linux system vs a Windows System. Right now things are working on the Windows system, but there is an error reading the data file paths in Linux/Mac</p>
+<p><strong>Troubleshooting</strong> - Double/triple check that the file paths are correct. Most of the time when you select a file you can copy the file path, which is better than typing it by hand because that can create issues. - If you have a Linux system, I would recommend downloading Virtual Studio Code (VsCode) and running it on an IDE. This is an ad hoc solution and will hopefully be figured out more later.</p>
+<p>Other bugs and ideas on how to fix them are in the indivdual file sections of the writeup. You can scroll up to go check those out.</p>
+</section>
+<section id="future-applications" class="level2">
+<h2 class="anchored" data-anchor-id="future-applications">7. Future applications</h2>
+<ul>
+<li>Definitely works for the TIMICI study – hopefully will work for other studies.</li>
+<li>Combining the health facility and non health facility information</li>
+<li>maybe can be reworked to also apply to diagnostic data.</li>
+</ul>
+</section>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -4,6 +4,7 @@ from enum import Enum
 
 poss_fts = (".csv")
 global filepath 
+filepath = ""
 global sheet_heads
 global all_data_dict
 
@@ -17,12 +18,19 @@ def get_dict():
 
 def get_filepath():
     return filepath
+
+def set_filepath(filepath_new):
+    global filepath
+    filepath = filepath_new
+
+
 # takes in the path to the file that you want to clean up
 # returns the file type as a string 
 def get_ft():
     global filepath 
-    filepath = input("Insert the file path of the data to be sorted: ")
-    end_pattern = ".[a-z]+$" 
+    if(filepath == ""):
+        filepath = input("Insert the file path of the data to be sorted: ")
+        end_pattern = ".[a-z]+$" 
     file_type = (re.search(end_pattern, filepath)).group()
     return file_type 
 
@@ -47,3 +55,4 @@ def validate_file(file_type):
         print("Please try again")
         get_ft()            
 
+    

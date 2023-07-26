@@ -11,7 +11,9 @@ Date of Edit: 29/6/23
     - fileReader.py
     - readToCSV.py
     - sortFreeText.py
-    - verifyData.py 
+    - selectData.py 
+    - combine_hf_data.py
+
 4. How to Install and Run the Project 
 5. External Libraries 
 6. Future Applications of the Code 
@@ -56,10 +58,12 @@ Because this project originally was working with the TIMICI data from Kenya, the
 | | | | | | 81 | Cefezolin | 
 
 **There are a few important things to note here** 
-1. Each separate category has it's own row in the codebook. The format is not such that there is one cell that has all the data in one block. 
-    - For Example: 
-    > 75=Céfadroxil OU Oracéfal|55=Céfixime OU Oroken OU Ofiken OU Fixim|63=Doxycycline OU Vibra|64=Erythromycine (Ery)|65=Flucloxacilline OU Staphypen OU Flustaph|67=Isoniazide (sans rifampicine, etc) OU Rimifon|68=Mupirocine OU Bactroban|70=Phénoxyméthylpénicilline OU Ospen|71=Rifampicine (sans isoniazide etc) OU Rimactan|38=Rifampicine / Isoniazide (RH)|39=Rifampicine / Isoniazide / Pyrazinamide / Ethambutol (RHZE) OU Lamprène|74=Chlortétracycline OU Tétracycline OU Auréomycine|96=Aucun des éléments ci-dessus 
-    - All being in the "value" category would not work and would lead to errors.  
+1. Each separate category has it's own row in the codebook. The format is not such that there is one cell that has all the data in one block
+
+    Example:
+        "75=Céfadroxil OU Oracéfal|55=Céfixime OU Oroken OU Ofiken OU Fixim|63=Doxycycline OU Vibra|64=Erythromycine (Ery)|65=Flucloxacilline OU Staphypen OU Flustaph|67=Isoniazide (sans rifampicine, etc) OU Rimifon|68=Mupirocine OU Bactroban|70=Phénoxyméthylpénicilline OU Ospen|71=Rifampicine (sans isoniazide etc) OU Rimactan|38=Rifampicine / Isoniazide (RH)|39=Rifampicine / Isoniazide / Pyrazinamide / Ethambutol (RHZE) OU Lamprène|74=Chlortétracycline OU Tétracycline OU Auréomycine|96=Aucun des éléments ci-dessus "
+    
+   - All being in the "value" category would not work and would lead to errors.  
 2. For cells that hold multiple different drug names that apply to a specific category or value 
     - Each value needs to be seperated by an OR, either uppercase or lower case 
         - If you are using the codebook from a language is not English, you need to go and change the values between drugs to be OR 
@@ -158,6 +162,7 @@ This code has not proved to be very buggy as of right now. There are a few centr
 ### d. selectData.py 
 
 **Major Functions** 
+
 |Function| Return Value | notes | 
 | --- | --- | --- | 
 | select_db_names_to_sort(): | returns the dictionary of the multi-select options, a dict of the categorized_data, and a string representing the freetext category| This serves as the main function of this file  | 
@@ -177,6 +182,27 @@ This program is used in preparation for the the sortFreeText.py function. It pre
 - the clean_cats(label) function once again relies on the format of the codebook to be consistent. Once again, look at the "codebook requirements" section for more information. 
 - When the program prompts the user by asking for the db_name requirement, it is important to be syntactically precise. 
 
+### e. combine_hf_data
+
+**Major Functions**
+
+|function| Return Value | notes |
+|---|---|---|
+|make_new_db_names|none| simple function initializing a new dictionary with the the new combined categories|
+|check_hf_and_reg| none | creates a new patient and checks if the hf and non_hf data match | 
+|combine_data | the new combined value | looks at the values and combines them | 
+
+**Use Case**
+This function works to combine the data that is stored in the health facility and non health facility data. It simply looks for values that aren't equal. 
+- For single select options: select the "yes" option if either the caregiver or the health facility have marked it as a drug that the patient is taking
+- For multi-select/drop down options, it will take a union for all the drugs that either the caregiver or the health facility have marked as being taken. 
+
+**Common Bugs and Troubleshooting**
+- Haven't seen any real bugs so far in this program 
+- Before performing data verification there was a bug when it wasn't recording the drugs for "multi select" drugs when the value for either caregiver or health facility data was "1". I think I fixed this bug but I haven't been able to see how it impacts the resulting data.
+
+
+
 ## 4. How to Install and Run the Program 
 
 1. **Check the Codebook and Data Formats**
@@ -191,17 +217,19 @@ This program is used in preparation for the the sortFreeText.py function. It pre
 - When you download these, put them in a folder. It can be helpful to put them in the same folder that the program is in. 
     - Additional optional step at this point is copying the file paths of the two of these and saving them in a separate document that is easily accessable. 
 
-3. **Run readToCSV.py**
+3. **Run main.py**
 - There are two ways to do this, one through a command line interface and one through an IDE 
     - Command Line Interface: 
         - If you are on Windows: Press Windows + R and type cmd into the dialog box that appears to open a new terminal. If you are using a Mac: open a terminal with the terminal app. 
         - In the command line, type ls to look at what folder you are in. 
-        - use the "cd" command to navigate to the src file for the repository.  
-        - type the command *python readToCSV.py* and press enter. 
+        - use the "cd" command to navigate to the categorize_algo folder in the repository.  
+            - path: src/categorize_algo
+        - type the command *python main.py* and press enter. 
 
     - In an IDE: 
         - Open the repository in your chosen IDE (integrated development environment)
-            - common ones include VsCode, pyCharm, IntelliJ, you might have to copy from Github. 
+            - common ones include VsCode, pyCharm, IntelliJ, you might have to copy the repository from Github. 
+                - https://support.atlassian.com/bitbucket-cloud/docs/clone-a-git-repository/ 
             - You can also download the source code from the switch drive. 
         - Configure with python3.0 or later 
         - run on the IDE 
@@ -215,9 +243,9 @@ This program is used in preparation for the the sortFreeText.py function. It pre
 - press enter. 
 
 6. **Provide the name for the freetext category**
-- Provide the name of the category that you are trying to fix. Often this is something like: 
-    - rx_misc_oth 
-    - rx_misc_oth_hf 
+- When prompted, provide the name of the category that you are trying to fix. Often this is something like: 
+    - rx_misc_oth  
+
 
 7. **Provide the path to the folder where you want the returning .csv file to be created**
 - Pretty self explainatory, make sure that you are just providing the path correctly and in the correct syntax 
@@ -234,8 +262,8 @@ This program is used in preparation for the the sortFreeText.py function. It pre
 ## 6. Current Bugs and Troubleshooting 
 
 **Bugs**
-- 29/06/23: 3:37pm: Sometimes the code will ask you for the file name of the data and the CSV File multiple times, as well as the name of the freetext category. This is a simple fix, I just can't seem to find the place where these functions are being called more than once.
 - 20/06/23: 3:38pm: Issues with running the code on a Linux system vs a Windows System. Right now things are working on the Windows system, but there is an error reading the data file paths in Linux/Mac 
+- 20/7/23: 3:47pm: The code relies on the "rx_" heading of the drug categories. 
 
 **Troubleshooting**
 - Double/triple check that the file paths are correct. Most of the time when you select a file you can copy the file path, which is better than typing it by hand because that can create issues. 
@@ -245,5 +273,4 @@ Other bugs and ideas on how to fix them are in the indivdual file sections of th
 
 ## 7. Future applications 
 - Definitely works for the TIMICI study -- hopefully will work for other studies. 
-- Combining the health facility and non health facility information 
 - maybe can be reworked to also apply to diagnostic data. 
